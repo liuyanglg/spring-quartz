@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <!--加载属性配置文件-->
+    <context:property-placeholder location="classpath*:/properties/jdbc*.properties"/>
+    <context:property-placeholder location="classpath*:/properties/log4j.properties"/>
+    <bean id="log4jPropertyConfigurer" class="com.lyf.timer.util.Log4jPropertyConfigurer">
+        <property name="location">
+                <value>properties/log4j.properties</value>
+        </property>
+    </bean>
+
+
+    <!-- 配置数据源1 -->
+    <bean id="dataSourceCenter" class="com.alibaba.druid.pool.DruidDataSource" init-method="close">
+        <!-- 基本属性 url、user、password -->
+        <property name="driverClassName">
+            <value>${center.jdbc.driver}</value>
+        </property>
+        <property name="url">
+            <value>${center.jdbc.url}</value>
+        </property>
+        <property name="username">
+            <value>${center.jdbc.username}</value>
+        </property>
+        <property name="password">
+            <value>${center.jdbc.password}</value>
+        </property>
+        <!-- 连接池最大使用连接数 -->
+        <property name="maxActive">
+            <value>${maxActive}</value>
+        </property>
+        <!-- 初始化连接大小 -->
+        <property name="initialSize">
+            <value>${initialSize}</value>
+        </property>
+        <!-- 获取连接最大等待时间 -->
+        <property name="maxWait">
+            <value>${maxWait}</value>
+        </property>
+        <!-- 连接池最大空闲 -->
+        <property name="maxIdle">
+            <value>${maxIdle}</value>
+        </property>
+        <!-- 连接池最小空闲 -->
+        <property name="minIdle">
+            <value>${minIdle}</value>
+        </property>
+        <!-- 自动清除无用连接 -->
+        <property name="removeAbandoned">
+            <value>true</value>
+        </property>
+        <!-- 清除无用连接的等待时间 -->
+        <property name="removeAbandonedTimeout">
+            <value>180</value>
+        </property>
+        <!-- 连接属性 -->
+        <property name="connectionProperties">
+            <value>clientEncoding=UTF-8</value>
+        </property>
+    </bean>
+
+    <!-- 配置数据源 2-->
+    <bean id="dataSourceCmp" class="com.alibaba.druid.pool.DruidDataSource" init-method="close">
+        <!-- 基本属性 url、user、password -->
+        <property name="driverClassName">
+            <value>${cmp.jdbc.driver}</value>
+        </property>
+        <property name="url">
+            <value>${cmp.jdbc.url}</value>
+        </property>
+        <property name="username">
+            <value>${cmp.jdbc.username}</value>
+        </property>
+        <property name="password">
+            <value>${cmp.jdbc.password}</value>
+        </property>
+        <!-- 连接池最大使用连接数 -->
+        <property name="maxActive">
+            <value>${maxActive}</value>
+        </property>
+        <!-- 初始化连接大小 -->
+        <property name="initialSize">
+            <value>${initialSize}</value>
+        </property>
+        <!-- 获取连接最大等待时间 -->
+        <property name="maxWait">
+            <value>${maxWait}</value>
+        </property>
+        <!-- 连接池最大空闲 -->
+        <property name="maxIdle">
+            <value>${maxIdle}</value>
+        </property>
+        <!-- 连接池最小空闲 -->
+        <property name="minIdle">
+            <value>${minIdle}</value>
+        </property>
+        <!-- 自动清除无用连接 -->
+        <property name="removeAbandoned">
+            <value>true</value>
+        </property>
+        <!-- 清除无用连接的等待时间 -->
+        <property name="removeAbandonedTimeout">
+            <value>180</value>
+        </property>
+        <!-- 连接属性 -->
+        <property name="connectionProperties">
+            <value>clientEncoding=UTF-8</value>
+        </property>
+    </bean>
+    <bean id="connectionFactory" class="com.lyf.timer.util.ConnectionFactory">
+        <property name="dataSourceCenter" ref="dataSourceCenter"></property>
+        <property name="dataSourceCmp" ref="dataSourceCmp"></property>
+    </bean>
+
+    <import resource="classpath*:/spring/spring-quartz.xml"/>
+
+</beans>
