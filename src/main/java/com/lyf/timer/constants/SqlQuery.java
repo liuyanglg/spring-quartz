@@ -104,6 +104,7 @@ public class SqlQuery {
             "  usercenter.`ucenter_user_service` T_US\n" +
             "WHERE\n" +
             "  T_US.c_taxnum=? AND\n" +
+            "   T_US.c_serviceid IS NOT NULL AND \n"+
             "  T_US.`dt_adddate` < DATE_SUB(NOW(), INTERVAL 1 DAY);";
     
     /*正式库新增数据的关联关系插入到关系表*/
@@ -137,6 +138,7 @@ public class SqlQuery {
             "  usercenter.`ucenter_user_service` T_US\n" +
             "WHERE\n" +
             "  T_US.c_taxnum=? AND\n" +
+            "   T_US.c_serviceid IS NOT NULL AND \n"+
             "  T_US.`dt_adddate` < DATE_SUB(NOW(), INTERVAL 1 DAY);";
 
     /*审核库新增数据的关联关系插入到关系表*/
