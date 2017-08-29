@@ -18,7 +18,7 @@
     <bean id="cronTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
         <property name="jobDetail" ref="jobDetail"/>
         <!--执行时间-->
-        <property name="cronExpression" value="0 0/30 * * * ?"/>
+        <property name="cronExpression" value="0 30 14 * * ?"/>
     </bean>
 
     <bean id="scheduler" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">

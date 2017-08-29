@@ -21,8 +21,10 @@ public class DBManager {
         switch (connectionName){
             case CENTER:
                 connection = getConnectionFactory().getConnectionCenter();
+                break;
             case CMP:
                 connection = getConnectionFactory().getConnectionCmp();
+                break;
         }
         return connection;
     }

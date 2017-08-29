@@ -10,7 +10,6 @@ package com.lyf.timer.constants;
  * @Copyright : 2017 liuyang Inc. All rights reserved.
  */
 public class SqlQuery {
-    public final static int PAGE_SIZE = 50;//分页大小
 
     /*   #1   usercenter.`ucenter_user_service`表每天都有新增数据，需要将这些新增的数据与正式库和审核库数据建立关联关系*/
     /*   #1.1   查询 ucenter_user_service前一天新增的数据，即税号(c_taxnum)和服务单位ID(c_serviceid)*/
