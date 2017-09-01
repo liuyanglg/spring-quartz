@@ -1,37 +1,39 @@
 package com.lyf.timer.util;
 
-import org.springframework.context.ApplicationContext;
-
 import java.sql.Connection;
 import java.sql.SQLException;
 
 
 public class DBManager {
-    private static ConnectionFactory connectionFactory;
+    public static DBManager dbManager;
+    private  ConnectionFactory connectionFactory;
 
-    public static ConnectionFactory getConnectionFactory() {
-        ApplicationContext context = SpringApplication.getContext();
-        connectionFactory = (ConnectionFactory) context.getBean("connectionFactory");
-        return connectionFactory;
+    public void setConnectionFactory(ConnectionFactory connectionFactory) {
+        this.connectionFactory = connectionFactory;
     }
+
+    private  void init(){
+        dbManager = this;
+    }
+
 
     public static Connection getConnection(DataSourceEnum connectionName) throws SQLException{
         Connection connection=null;
 
         switch (connectionName){
             case CENTER:
-                connection = getConnectionFactory().getConnectionCenter();
+                connection = dbManager.connectionFactory.getConnectionCenter();
                 break;
             case CMP:
-                connection = getConnectionFactory().getConnectionCmp();
+                connection = dbManager.connectionFactory.getConnectionCmp();
                 break;
         }
         return connection;
     }
 
     public static void closeDataSource() throws SQLException{
-        connectionFactory.getConnectionCenter().close();
-        connectionFactory.getConnectionCenter().close();
+        dbManager.connectionFactory.getConnectionCenter().close();
+        dbManager.connectionFactory.getConnectionCenter().close();
     }
 
 }

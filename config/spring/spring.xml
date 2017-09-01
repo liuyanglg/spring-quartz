@@ -4,6 +4,8 @@
        xmlns:context="http://www.springframework.org/schema/context"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
+    <!--扫描注解包-->
+    <context:component-scan base-package="com.lyf"/>
     <!--加载属性配置文件-->
     <context:property-placeholder location="classpath*:/properties/jdbc*.properties"/>
     <context:property-placeholder location="classpath*:/properties/log4j.properties"/>
@@ -114,6 +116,10 @@
     <bean id="connectionFactory" class="com.lyf.timer.util.ConnectionFactory">
         <property name="dataSourceCenter" ref="dataSourceCenter"></property>
         <property name="dataSourceCmp" ref="dataSourceCmp"></property>
+    </bean>
+
+    <bean id="dbManager" class="com.lyf.timer.util.DBManager">
+        <property name="connectionFactory" ref="connectionFactory"/>
     </bean>
 
     <import resource="classpath*:/spring/spring-quartz.xml"/>
