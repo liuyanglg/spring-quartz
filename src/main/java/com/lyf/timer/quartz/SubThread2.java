@@ -142,7 +142,8 @@ public class SubThread2 extends Thread {
                 if (insertSql != null && insertSql.trim().length() > 0) {
                     JdbcUtils.insertBatch(insertSql, cmpConnection, queryList2, keys[1]);//将关联关系插入关系表
                 }
-
+                log.info("thread2 queryList1:"+queryList1.size());
+                log.info("thread2 queryList2:"+queryList2.size());
             } catch (Exception e) {
                 e.printStackTrace();
             }
