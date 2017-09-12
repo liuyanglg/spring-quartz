@@ -141,6 +141,37 @@ public class SqlQuery {
             "   T_US.c_serviceid IS NOT NULL AND \n"+
             "  T_US.`dt_adddate` < DATE_SUB(NOW(), INTERVAL 1 DAY);";
 
-    /*审核库新增数据的关联关系插入到关系表*/
+    /*审核库数据的关联关系插入到关系表*/
     public final static String SQL_INSERT_NEW_TB_RA = "INSERT INTO dataserver.`tb_code_taxid_serviceid` (`code`,`taxid`,`serviceid`)VALUE (?, ?, ?);";
+
+    /*初始化操作*/
+    /*查询审核库新增数据*/
+    public final static String SQL_QUERY_NEW_TB_A_INIT= "SELECT \n" +
+            "  T_A.`code`  AS `code`,\n" +
+            "  T_A.`taxid` AS `taxid`,\n" +
+            "  T_M.`taxid` AS `taxidM`\n" +
+            "FROM\n" +
+            "  dataserver.`tb_cmp_card_audit` T_A\n" +
+            "  LEFT JOIN dataserver.`tb_cmp_card` T_M ON T_A.`code` = T_M.`code`\n" +
+            "WHERE\n" +
+            "  T_A.`createtime` >= DATE_SUB(NOW(), INTERVAL 1 DAY)\n" +
+            "LIMIT ?, ?;";
+
+    /*查询审核库所有数据的数量*/
+    public final static String SQL_QUERY_NEW_TB_A_COUNT_INIT = "SELECT COUNT(T_A.`id`)\n" +
+            "FROM\n" +
+            "  dataserver.`tb_cmp_card_audit` T_A\n" +
+            "  LEFT JOIN dataserver.`tb_cmp_card` T_M ON T_A.`code` = T_M.`code`\n";
+
+    /*根据审核库查询出来的数据，查询与用户中心的数据的关联关系*/
+    public final static String SQL_QUERY_OLD_TB_US_FOR_A_INIT= "SELECT\n" +
+            "  ? AS 'code',\n" +
+            "  ? AS 'taxid',\n" +
+            "  T_US.`c_serviceid` AS `serviceid`\n" +
+            "FROM\n" +
+            "  usercenter.`ucenter_user_service` T_US\n" +
+            "WHERE\n" +
+            "  T_US.c_taxnum=? AND\n" +
+            "   T_US.c_serviceid IS NOT NULL AND \n"+
+            "  T_US.`dt_adddate` < DATE_SUB(NOW(), INTERVAL 1 DAY);";
 }

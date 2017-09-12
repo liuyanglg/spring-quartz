@@ -28,6 +28,7 @@ public class TimerTaskJob extends QuartzJobBean {
     public static Logger log = Logger.getLogger(TimerTaskJob.class.getName());
 
     public static volatile int threadCounter = 0;
+    public static volatile int init = 1;
     private static Connection centerConnection = null;
     private static Connection cmpConnection = null;
     private int pageSize = 500;
@@ -48,18 +49,22 @@ public class TimerTaskJob extends QuartzJobBean {
     @Override
     protected void executeInternal(JobExecutionContext jobExecutionContext) throws JobExecutionException {
         initParams();
-        /*更新用户中心每天新增的数据*/
         Long timeStart1 = System.currentTimeMillis();
 
         int batchThreadNum = 5;
         threadCounter += 2 * batchThreadNum;
-        updateAddUserServiceForA(pageSize, batchThreadNum);
+        if(init>0) {
+            updateInitAudit(pageSize, batchThreadNum);
+        }else {
+        /*更新用户中心每天新增的数据*/
+            updateAddUserServiceForA(pageSize, batchThreadNum);
 
         /*审核库中每天新增的数据*/
-        updateAddAudit(pageSize, batchThreadNum);
+            updateAddAudit(pageSize, batchThreadNum);
+        }
+            destroy();//释放连接池
+            Long timeEnd1 = System.currentTimeMillis();
 
-        destroy();//释放连接池
-        Long timeEnd1 = System.currentTimeMillis();
         log.info("更新完毕，耗时为：" + getTimeString(timeEnd1 - timeStart1));
     }
 
@@ -128,7 +133,55 @@ public class TimerTaskJob extends QuartzJobBean {
     public static void countDown(String threadName) {
         threadCounter--;
 //        System.out.println(threadName +" has finished, the remain number of running thread  is:" + threadCounter);
-        log.info(threadName +" has finished,  remain  running thread :" + threadCounter);
+        log.info(threadName + " has finished,  remain  running thread :" + threadCounter);
+    }
+
+    /**
+     * @Method : updateAddAudit
+     * @Description : 将审核库每天新增的数据与用户中心前一天的所有数据建立关系，
+     * 如果与用户中心的全部数据关联，用户中心和审核库每天增的数据将重复建立关系，下同
+     * @param pageSize :
+     * @param threadNum :
+     * @return : void
+     * @author : liuya
+     * @CreateDate : 2017-08-23 星期三 18:10:05
+     */
+    public void updateInitAudit(int pageSize, int threadNum) {
+        int totalSize = 0;
+        try {
+            cmpConnection = DBManager.getConnection(DataSourceEnum.CMP);
+            totalSize = JdbcUtils.count(SQL_QUERY_NEW_TB_A_COUNT_INIT, cmpConnection);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            JdbcUtils.close(cmpConnection);
+        }
+
+        String[][] keys = {{"code", "taxid", "taxidM"}, {"code", "taxid", "serviceid"}};//SQL语句占位符
+        int taskSize = 0;//每个线程处理的任务量
+        int remain = 0;
+        if (totalSize % (pageSize * threadNum) == 0) {
+            taskSize = totalSize / threadNum;
+        } else {
+            remain = totalSize % (pageSize * threadNum);
+            taskSize = (totalSize - remain) / threadNum;
+        }
+
+        for (int i = 0; i < threadNum; i++) {
+            SubThread2 subThread = new SubThread2();
+            String[] querySqlArray = {SQL_QUERY_NEW_TB_A_INIT, SQL_QUERY_OLD_TB_US_FOR_A_INIT};
+            subThread.setQuerySql(querySqlArray);
+            subThread.setInsertSql(SQL_INSERT_NEW_TB_RA);
+            if (i < threadNum - 1) {
+                subThread.setTaskSize(taskSize);
+            } else {
+                subThread.setTaskSize(taskSize + remain);
+            }
+            subThread.setOffset(i * taskSize);
+            subThread.setPageSize(pageSize);
+            subThread.setKeys(keys);
+            subThread.start();
+        }
     }
 
     /**
